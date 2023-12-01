@@ -128,11 +128,20 @@ class HuffTree {
     private:
     HuffNode* Root; // Tree root
     public:
+    int stt;
     HuffTree(char& val, int freq) // Leaf constructor
     { Root = new LeafNode(val, freq); }
+    HuffTree(char& val, int freq,int stt) // Leaf constructor
+    { Root = new LeafNode(val, freq); 
+        this->stt=stt;
+    }
     // Internal node constructor
     HuffTree(HuffTree* l, HuffTree* r)
     { Root = new IntlNode(l->root(), r->root()); }
+    HuffTree(HuffTree* l, HuffTree* r,int stt)
+    { Root = new IntlNode(l->root(), r->root()); 
+        this->stt=stt;
+    }
     ~HuffTree() {} // Destructor
     HuffNode* root() { return Root; } // Get root
     int weight() { return Root->weight(); } // Root weight
@@ -161,22 +170,25 @@ class HuffTree {
 };
 
 struct minTreeComp {
-    bool operator()( HuffTree* lhs,  HuffTree* rhs) const {
-        if(lhs->weight()!= rhs->weight())
-        return lhs->weight() > rhs->weight(); // Change to < for min heap, > for max heap
-        else return false;
+    bool operator()( HuffTree* lhs,  HuffTree* rhs)  {
+        if(lhs->weight()==rhs->weight()) return lhs->stt>rhs->stt;
+        return lhs->weight()>rhs->weight();
     }
 };
+
 
 // Build a Huffman tree from a collection of frequencies
 
 HuffTree* buildHuff(HuffTree** TreeArray, int count) {
-    std::priority_queue<HuffTree*, std::vector<HuffTree*>, minTreeComp> forest(TreeArray, TreeArray+ count);
+    std::priority_queue<HuffTree*, std::vector<HuffTree*>, minTreeComp> forest;
+    for(int i=0;i<count-1;++i){
+        forest.push(TreeArray[i]);
+    }
     HuffTree *temp1, *temp2, *temp3 = nullptr;
     while (forest.size() > 1) {
         temp1 = forest.top(); forest.pop();
         temp2 = forest.top(); forest.pop();
-        temp3 = new HuffTree(temp1, temp2);
+        temp3 = new HuffTree(temp1, temp2,count);
         forest.push(temp3);
         // Note: No need to manually delete temp1 and temp2; they are now owned by the priority_queue
     }
@@ -198,16 +210,17 @@ inline void simulate(string filename)
         {
             ss>>name;
             string s=handle_name(name);
+            cout<<s<<endl;
             int n=20;
             HuffTree** arr = new HuffTree*[s.length()];
             int count=0;
             int k=1;
-            for(int i=0;i<s.length()-1;++i){
+            for(int i=0;i<s.length();++i){
                 if(s[i]==s[i+1]){
                     k++;
                 }
                 else{
-                    arr[count]=new HuffTree(s[i],k);
+                    arr[count]=new HuffTree(s[i],k,count+1);
                     k=1;
                     count++;
                 };

@@ -1,2 +1,2 @@
 MAXSIZE 5
-LAPSE ahauhuwhuwhdudd
+LAPSE abcde
