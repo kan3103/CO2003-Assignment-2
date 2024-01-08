@@ -4,5 +4,5 @@
 #include<string>
 
 using namespace std;
-
+ int memory_leak=0;
 #endif
